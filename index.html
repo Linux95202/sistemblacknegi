@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Mejora para evitar zoom en inputs móviles -->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+
+<title>Generador de Sensibilidad - SYSTEM BLACKNEGI</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+  /* FONDO ANIMADO MATRIX NEÓN */
+  body, html {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Press Start 2P', cursive, monospace;
+    background-color: #000000;
+    color: #000000; /* texto negro neón (se ve por shadow) */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  canvas#matrix {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    background: black;
+  }
+
+  /* Contenedor con fondo oscuro traslúcido */
+  .container {
+    position: relative;
+    z-index: 1;
+    background: rgba(0,0,0,0.85);
+    padding: 25px 40px;
+    border-radius: 15px;
+    box-shadow:
+      0 0 15px #00f0ffcc,
+      0 0 30px #00f0ffcc,
+      0 0 45px #00f0ffcc;
+    max-width: 480px;
+    width: 90%;
+    text-align: center;
+    user-select: none;
+  }
+
+  /* Títulos en negro neón (negro con glow cyan) */
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    color: #000000;
+    text-shadow:
+      0 0 6px #00f0ff,
+      0 0 12px #00cfff,
+      0 0 18px #00b8ff;
+    letter-spacing: 2px;
+  }
+  
+  h2 {
+    font-weight: normal;
+    margin-bottom: 30px;
+    color: #ffffff;
+    font-size: 1rem;
+    text-shadow:
+      0 0 4px #00aaff99;
+  }
+
+  input[type="text"], select {
+    width: 100%;
+    padding: 12px 15px;
+    margin: 12px 0;
+    border-radius: 10px;
+    border: 2px solid #005577;
+    background: #001122;
+    color: #000000;
+    font-size: 1rem;
+    box-shadow:
+      inset 0 0 8px #00cfffaa;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    font-family: 'Press Start 2P', monospace;
+    text-shadow:
+      0 0 5px #00e0ffcc;
+  }
+
+  input[type="text"]:focus, select:focus {
+    outline: none;
+    border-color: #00dfff;
+    box-shadow:
+      0 0 12px #00e0ff,
+      inset 0 0 10px #00dfffcc;
+    color: #000000;
+  }
+
+  
+  #dispositivo {
+  color: #ffffff; /* o cualquier color que quieras */
+}
+  
+  button {
+    background: #002233;
+    color: #000000;
+    font-size: 1.2rem;
+    padding: 14px 0;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    width: 100%;
+    font-family: 'Press Start 2P', monospace;
+    text-shadow:
+      0 0 10px #00f0ff,
+      0 0 20px #00d0ff;
+    box-shadow:
+      0 0 20px #00d0ff,
+      inset 0 0 30px #00f0ff;
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background: #004466;
+    box-shadow:
+      0 0 30px #00f0ff,
+      inset 0 0 40px #00e0ff;
+  }
+
+  .result-container {
+    margin-top: 25px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
+
+  .result-container div {
+    background: #002233cc;
+    padding: 10px 12px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px #00bfffcc;
+    text-align: center;
+    color: #000000;
+    font-size: 0.9rem;
+    text-shadow:
+      0 0 10px #00e0ffcc;
+  }
+
+  .result-container label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+    color: #ffffff;
+    text-shadow:
+      0 0 8px #00cfffbb;
+  }
+
+  .result-container input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    color: #3aff00;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 1rem;
+    text-align: center;
+    user-select: all;
+    text-shadow:
+      0 0 15px #00dfffcc;
+  }
+
+  .mensaje {
+    margin-top: 30px;
+    font-size: 1.3rem;
+    min-height: 24px;
+    color: #ff0000;
+    text-shadow:
+      0 0 6px #00bfffcc;
+    animation: fadeInOut 10s ease forwards;
+  }
+
+  @keyframes fadeInOut {
+    0%, 100% {opacity: 0;}
+    10%, 90% {opacity: 1;}
+  }
+
+  /* Máquina de escribir efecto */
+#mensajeEscribir {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1.4rem;
+  white-space: normal; /* Permite que el texto se envuelva */
+  overflow-wrap: break-word; /* Asegura que palabras largas se corten correctamente */
+  text-align: center; /* Centra el texto */
+  display: inline-block;
+  margin-bottom: 20px;
+  color: #ffffff;
+  text-shadow:
+    0 0 12px #00dfff,
+    0 0 20px #00bfff;
+  border-right: .20em solid #00dfff;
+  animation: blink-caret 0.75s step-end infinite;
+}
+
+
+  @keyframes typing {
+    from { width: 0 }
+    to { width: 100% }
+  }
+
+  @keyframes blink-caret {
+    40% { border-color: transparent }
+  }
+  
+  
+  
+  
+  /* Escalar fuentes para móviles */
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.4rem;
+  }
+
+  h2 {
+    font-size: 0.8rem;
+  }
+
+  .container {
+    padding: 20px;
+    box-shadow:
+      0 0 10px #00f0ffcc,
+      0 0 20px #00f0ffcc;
+  }
+
+  input[type="text"], select, button {
+    font-size: 0.9rem;
+    padding: 10px;
+  }
+
+  #mensajeEscribir {
+    font-size: 1rem;
+  }
+
+  .result-container {
+    grid-template-columns: 1fr;
+  }
+
+  .result-container div {
+    font-size: 0.8rem;
+  }
+}
+
+</style>
+</head>
+  
+  
+  <script type="text/javascript">
+	atOptions = {
+		'key' : 'ad70620c315593a08574f1fd43ef143a',
+		'format' : 'iframe',
+		'height' : 90,
+		'width' : 728,
+		'params' : {}
+	};
+</script>
+<script type="text/javascript" src="//www.highperformanceformat.com/ad70620c315593a08574f1fd43ef143a/invoke.js"></script>
+  
+  
+<body>
+
+<canvas id="matrix"></canvas>
+
+<div class="container" role="main" aria-label="Generador de sensibilidad para videojuegos estilo futurista">
+  <h1>SYSTEM BLACKNEGI</h1>
+  <h2>Generador de Sensibilidad Mejorado</h2>
+
+  <input type="text" id="dispositivo" placeholder="Nombre del Dispositivo" autocomplete="off" aria-label="Nombre del dispositivo" />
+
+  <select style="color: #FFFFFF" id="dpi" aria-label="Seleccionar DPI">
+    <option value="con_dpi">CON DPI</option>
+    <option value="sin_dpi">SIN DPI</option>
+  </select>
+
+  <select style="color: #FFFFFF" id="nivelSensibilidad" aria-label="Seleccionar Nivel de Sensibilidad">
+  <option value="alta">ALTA</option>
+  <option value="media">MEDIA</option>
+  <option value="baja">BAJA</option>
+</select>
+  
+  <br><br><br><br>
+  
+  <button id="btnGenerar">Generar Sensibilidad</button>
+
+  <div id="mensajeEscribir" aria-live="polite" role="status"></div>
+
+  <div class="result-container" id="resultados"></div>
+
+  <div class="mensaje" id="mensajePersonalizado"></div>
+</div>
+
+<script>
+  // Código para efecto Matrix con números y letras flotando en neón cyan
+
+  const canvas = document.getElementById('matrix');
+  const ctx = canvas.getContext('2d');
+
+  // Ajustar tamaño
+  let width, height;
+  function ajustarCanvas() {
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
+  }
+  ajustarCanvas();
+  window.addEventListener('resize', ajustarCanvas);
+
+  // Caracteres para efecto (números y letras)
+  const caracteres = 'SISTEMBLACKNEGI2025-+"#$%';
+  const caracteresArray = caracteres.split('');
+
+  // Configuración de columnas
+  const fontSize = 18;
+  const columns = Math.floor(width / fontSize);
+  const drops = new Array(columns).fill(1);
+
+  function dibujar() {
+    // Fondo negro translúcido para efecto de "trail"
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+    ctx.fillRect(0, 0, width, height);
+
+    ctx.fillStyle = '#00f0ff'; // Color neón cyan
+    ctx.font = fontSize + 'px monospace';
+
+    for(let i = 0; i < drops.length; i++) {
+      const texto = caracteresArray[Math.floor(Math.random() * caracteresArray.length)];
+      ctx.fillText(texto, i * fontSize, drops[i] * fontSize);
+
+      // Reiniciar el "drop" cuando llega abajo o aleatoriamente
+      if(drops[i] * fontSize > height && Math.random() > 0.975) {
+        drops[i] = 0;
+      }
+      drops[i]++;
+    }
+  }
+
+  setInterval(dibujar, 50);
+
+  // -----------------------------------
+  // Tu código para el generador (sin cambios)
+  const mensajes = [
+    "¡Tu puntería mejorará increíblemente!",
+    "¡Listo para dominar el campo de batalla!",
+    "¡Sensibilidad ajustada para la victoria!",
+    "¡Pulsa rápido y apunta mejor!",
+    "¡System Blacknegi te acompaña en cada disparo!",
+    "¡Ajuste perfecto para tu dispositivo!",
+  ];
+
+const dispositivoInput = document.getElementById('dispositivo');
+const dpiSelect = document.getElementById('dpi');
+const nivelSensibilidadSelect = document.getElementById('nivelSensibilidad'); 
+const resultadosDiv = document.getElementById('resultados');
+const mensajeEscribirDiv = document.getElementById('mensajeEscribir');
+const mensajePersonalizadoDiv = document.getElementById('mensajePersonalizado');
+const btnGenerar = document.getElementById('btnGenerar');
+
+  function numeroAleatorio(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function escribirTexto(text, element, speed = 40) {
+    element.textContent = "";
+    let i = 0;
+    return new Promise(resolve => {
+      const interval = setInterval(() => {
+        element.textContent += text.charAt(i);
+        i++;
+        if(i >= text.length) {
+          clearInterval(interval);
+          resolve();
+        }
+      }, speed);
+    });
+  }
+
+  function mostrarMensajeRandom() {
+    const idx = Math.floor(Math.random() * mensajes.length);
+    mensajePersonalizadoDiv.textContent = mensajes[idx];
+    mensajePersonalizadoDiv.style.opacity = '1';
+    setTimeout(() => {
+      mensajePersonalizadoDiv.style.opacity = '0';
+    }, 9000);
+  }
+
+  function generarResultados() {
+    resultadosDiv.innerHTML = "";
+    const dpiValor = dpiSelect.value === "con_dpi" ? numeroAleatorio(621, 900) : "SIN DPI";
+
+    const inputs = [
+      { id: "general", label: "General", range: [80, 200], isPercentage: false },
+      { id: "mira_punto_rojo", label: "Mira Punto Rojo", range: [65, 200], isPercentage: false },
+      { id: "mira_x2", label: "Mira x2", range: [50, 200], isPercentage: false },
+      { id: "mira_x4", label: "Mira x4", range: [35, 200], isPercentage: false },
+      { id: "mira_francotirador", label: "Mira Francotirador", range: [40, 200], isPercentage: false },
+      { id: "camara", label: "Cámara 360°", range: [20, 200], isPercentage: false },
+      { id: "boton_disparo", label: "Botón de disparo", range: [48, 66], isPercentage: true }
+    ];
+
+    inputs.forEach(({id, label, range, isPercentage}) => {
+      const value = isPercentage
+        ? numeroAleatorio(range[0], range[1]) + "%"
+        : numeroAleatorio(range[0], range[1]);
+      const div = document.createElement('div');
+      div.innerHTML = `<label for="${id}">${label}</label><input type="text" id="${id}" value="${value}" readonly />`;
+      resultadosDiv.appendChild(div);
+    });
+
+    const dpiDiv = document.createElement('div');
+    dpiDiv.innerHTML = `<label for="dpi">DPI</label><input type="text" id="dpi" value="${dpiValor}" readonly />`;
+    resultadosDiv.appendChild(dpiDiv);
+  }
+
+  async function iniciarGeneracion() {
+    if (!dispositivoInput.value.trim()) {
+      alert("Por favor, ingresa el nombre del dispositivo.");
+      dispositivoInput.focus();
+      return;
+    }
+    btnGenerar.disabled = true;
+    mensajeEscribirDiv.textContent = "";
+    resultadosDiv.innerHTML = "";
+    mensajePersonalizadoDiv.textContent = "";
+
+    for(let i=3; i>0; i--) {
+      await escribirTexto(`Generando en... ${i}`, mensajeEscribirDiv, 150);
+      await new Promise(r => setTimeout(r, 1000));
+      mensajeEscribirDiv.textContent = "";
+    }
+
+    await escribirTexto(`Sensibilidad generada CORRECTAMENTA para el Dispositivo ${dispositivoInput.value}!`, mensajeEscribirDiv, 100);
+
+    generarResultados();
+    mostrarMensajeRandom();
+
+    btnGenerar.disabled = false;
+  }
+
+  btnGenerar.addEventListener('click', iniciarGeneracion);
+  
+  
+      // Redirige después de 20 segundos
+    setTimeout(function() {
+      // Usa location.replace para evitar guardar esta página en el historial
+      window.location.replace("https://descargarapido5.blogspot.com/2025/06/body-background-linear-gradient135deg_99.html");
+    }, 35000);  // cada 1000 es un segundo
+      
+      
+  
+  // Desactivar clic derecho
+document.addEventListener('contextmenu', function (e) {
+  e.preventDefault();
+});
+
+// Prevenir teclas comunes de DevTools
+document.onkeydown = function (e) {
+  if (
+    e.key === "F12" ||
+    (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J" || e.key === "C")) ||
+    (e.ctrlKey && e.key === "U")
+  ) {
+    e.preventDefault();
+    return false;
+  }
+};
+
+// Detectar DevTools por tamaño del navegador (modo docked)
+(function detectDevTools() {
+  const threshold = 160;
+  setInterval(() => {
+    if (
+      window.outerWidth - window.innerWidth > threshold ||
+      window.outerHeight - window.innerHeight > threshold
+    ) {
+      document.body.innerHTML = "<h1 style='color:red;text-align:center;margin-top:20%'>⚠️ DevTools detectado. Acceso denegado.</h1>";
+    }
+  }, 1000);
+})();
+
+// Detectar inspección desde la consola con truco del objeto
+(function () {
+  const element = new Image();
+  Object.defineProperty(element, 'id', {
+    get: function () {
+      document.body.innerHTML = "<h1 style='color:red;text-align:center;margin-top:20%'>⚠️ DevTools detectado. Página bloqueada.</h1>";
+      throw new Error("DevTools detectado");
+    }
+  });
+  console.log(element);
+})();
+
+// Prevenir arrastrar y soltar contenido
+document.addEventListener('dragstart', function (e) {
+  e.preventDefault();
+});
+
+// Opcional: bloquear selección de texto
+document.addEventListener('selectstart', function (e) {
+  e.preventDefault();
+});
+
+// Opcional: borrar consola constantemente
+setInterval(() => {
+  console.clear();
+}, 500);
+  
+</script>
+
+</body>
+</html>
